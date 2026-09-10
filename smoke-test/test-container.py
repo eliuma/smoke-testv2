@@ -33,10 +33,13 @@ def test_application_health():
 
     # Require the image produced or explicitly pulled by the caller.
     # This prevents silently pulling an unintended image if it is missing.
-    with docker.from_env() as client:
+    client = docker.from_env() 
+    try:
         built_image = client.images.get(image)
         print(f"Testing image: {image}")
         print(f"Local image ID: {built_image.id}")
+    finally:
+        client.close()
 
     container = DockerContainer(image).with_exposed_ports(port)
 
