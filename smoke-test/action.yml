@@ -35,10 +35,29 @@ inputs:
     required: false
     default: "{}"
 
+  base-image:
+    description: >-
+      Candidate base image the application image must have been built from.
+      When set, the test fails if the image's layers do not start with the
+      base image's layers. Leave empty to skip the check.
+    required: false
+    default: ""
+
+  log-error-patterns:
+    description: >-
+      Pipe-separated strings that mark a failed startup when found in the
+      container log, even if the health check passed. Leave empty for the
+      built-in defaults.
+    required: false
+    default: ""
+
 outputs:
   report-path:
-    description: Directory containing JUnit results and container logs.
+    description: Directory containing JUnit results, container logs, and smoke-result.json.
     value: ${{ steps.prepare.outputs.report-path }}
+  reason:
+    description: One-line explanation of the pass or fail, for status callbacks.
+    value: ${{ steps.test.outputs.reason }}
 
 runs:
   using: composite
@@ -62,6 +81,7 @@ runs:
           -r "${ACTION_DIRECTORY}/requirements-test.txt"
 
     - name: Run container smoke test
+      id: test
       shell: bash
       env:
         ACTION_DIRECTORY: ${{ github.action_path }}
@@ -73,6 +93,8 @@ runs:
         HEALTH_TIMEOUT: ${{ inputs.timeout }}
         HEALTH_INTERVAL: ${{ inputs.interval }}
         CONTAINER_ENV_JSON: ${{ inputs.container-env }}
+        BASE_IMAGE: ${{ inputs.base-image }}
+        LOG_ERROR_PATTERNS: ${{ inputs.log-error-patterns }}
         REPORT_DIRECTORY: ${{ steps.prepare.outputs.report-path }}
         PYTEST_DISABLE_PLUGIN_AUTOLOAD: "1"
         PYTHONDONTWRITEBYTECODE: "1"
