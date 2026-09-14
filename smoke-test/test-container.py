@@ -63,7 +63,8 @@ def test_application_health():
     # ---- 2. Check the images ------------------------------------------------
     # Require the image produced or explicitly pulled by the caller.
     # This prevents silently pulling an unintended image if it is missing.
-    with docker.from_env() as client:
+    client = docker.from_env()
+    try:
         try:
             app = client.images.get(image)
         except ImageNotFound:
@@ -90,6 +91,8 @@ def test_application_health():
                     "Check the build used the candidate tag with pull and no-cache on."
                 )
             print(f"Confirmed base image: {base_image}")
+    finally:
+        client.close()
 
     # ---- 3. Start the container and wait for it to answer -------------------
     container = DockerContainer(image).with_exposed_ports(port)
