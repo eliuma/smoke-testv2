@@ -39,15 +39,14 @@ inputs:
     description: >-
       Candidate base image the application image must have been built from.
       When set, the test fails if the image's layers do not start with the
-      base image's layers. Leave empty to skip the check.
+      base image's layers. 
     required: false
     default: ""
 
   log-error-patterns:
     description: >-
       Pipe-separated strings that mark a failed startup when found in the
-      container log, even if the health check passed. Leave empty for the
-      built-in defaults.
+      container log, even if the health check passed. 
     required: false
     default: ""
 
