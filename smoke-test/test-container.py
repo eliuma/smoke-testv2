@@ -158,6 +158,7 @@ def test_application_health():
                         print(f"Health check passed: {last_result}")
                         healthy = True
                         break
+                    last_result = f"HTTP {response.status_code} {response.text[:300].strip()}"
 
                 except requests.RequestException as error:
                     last_result = type(error).__name__
